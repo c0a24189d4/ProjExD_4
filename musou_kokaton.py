@@ -127,6 +127,7 @@ class Shield(pg.sprite.Sprite):
         }
         self.image = self.imgs[bird.dire]
         self.rect = self.image.get_rect()
+        self.mask = pg.mask.from_surface(self.image)
         self.bird = bird
         self.life = life  # 盾の耐久時間
 
@@ -139,6 +140,7 @@ class Shield(pg.sprite.Sprite):
         self.rect.center = pgm.Vector2(self.bird.rect.center) + pgm.Vector2(self.bird.dire)*self.bird.rect.width
         self.image = self.imgs[self.bird.dire]
         self.image.set_colorkey((0, 0, 0))
+        self.mask = pg.mask.from_surface(self.image)
         self.life -= 1
         if self.life < 0:
             self.kill()
@@ -336,6 +338,10 @@ def main():
             pg.display.update()
             time.sleep(2)
             return
+        
+        for bomb in pg.sprite.groupcollide(bombs, shields, True, False, pg.sprite.collide_mask).keys():  # 盾と衝突した爆弾リスト
+            exps.add(Explosion(bomb, 50))  # 爆発エフェクト
+            score.value += 1  # 1点アップ
 
         bird.update(key_lst, screen)
         beams.update()
